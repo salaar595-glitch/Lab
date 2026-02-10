@@ -1,0 +1,59 @@
+<!Doctype html>
+<html lang = "uk">
+<head>
+    <meta charset = "utf-8" />
+    <meta name = "viewport" content = "width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" type="text/css">
+    <script src="app.js" defer>  </script>
+    <title> Оголошення  </title>
+</head>
+<body>
+    <header>
+    <h1>Доска оголошень групи </h1>
+
+    </header>
+<main> 
+    <section class="formsection">
+    <h2>Створити пост</h2>
+    <form id="postform"> 
+        <label for="title">Заголовок</label>
+        <input type="text" id="title" required> </input>
+        <label for="category">Категорія</label>
+        <select id="category" required>
+            <option value="">Оберіть</option>
+            <option value="Навчання">Навчання</option> 
+            <option value="Робота">Робота</option> 
+            <option value="Продаж">Продаж</option> 
+            <option value="Інше">Інше</option> 
+        </select>
+        <label for="Body">Зміст</label>
+        <textarea id="Body" required></textarea>
+        <label for="Author">Автор</label>
+        <input type="text" id="Author" required>
+          <div id="formError" class="error"></div>
+        <button type="submit" id="submitbtn" required>Надіслати пост</button>
+        <button type="button" id="deletebtn" ruquired>Очистити</button>
+
+  </form>
+  </section>
+  <section class="listsection">
+    <h2>Таблиця оголошень</h2>
+  <table>
+    <thread>
+        <tr>
+        <th>Заголовок</th>
+         <th>Котегорія</th>
+          <th>Зміст</th>
+           <th>Дата</th>
+            <th>Автор</th>
+            </tr>
+    </thread>
+     </table>
+  </section>
+
+</main>
+<footer>
+</footer>
+</body> 
+
+</html>
