@@ -6,15 +6,68 @@ body {
     justify-content: center;
     align-items: center;
     margin:50px auto;
+  
 }
+#divhead{ 
+    border-radius:10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0 , 0.1);
+}
+.container{
+   display: flex;
+    flex-direction: column; 
+    gap: 30px;
+    align-items: center;    
+    width: 90%;
+    max-width: 800px;
+}
+
 
 h1 { 
     text-align: center;
-    background-color: red;
+    
+ 
 }
-.submitbtn { 
-     position: absolute;
-    top:50%;
-    color: red;
+h2{ 
+    text-align: center;
+    padding: 5px;
+}
+#postform input,
+#postform label,
+#postform select,
+#postform textarea{
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+
+ 
+}
+.listsection{
+    width: 1000px;
+    flex: 1;
+    background-color: rgb(255, 255, 255);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+table{
+    border-collapse: collapse;
+    width: 100%;
+
+}
+table, th, tr{
+    border: 1px solid black;
+}
+.formsection{
+    width: 400px;
+    flex: 1;
+    background-color: rgb(255, 255, 255);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+#submitbtn{ 
+
+}
+#deletebtn{
 
 }
