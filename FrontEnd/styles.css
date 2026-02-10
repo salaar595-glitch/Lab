@@ -1,0 +1,20 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    margin:50px auto;
+}
+
+h1 { 
+    text-align: center;
+    background-color: red;
+}
+.submitbtn { 
+     position: absolute;
+    top:50%;
+    color: red;
+
+}
