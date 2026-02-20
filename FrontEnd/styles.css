@@ -4,15 +4,14 @@
     box-sizing: border-box;
 }
 body {
-    font-family:Brush Script MT, Brush Script Std, cursive ;
+    font-family:DejaVu Sans Mono, monospace ;
     display:flex;
     justify-content: center;
     align-items: center;
-    margin:50px auto;
+    margin:50px;
     background: linear-gradient(to right,
     rgb(195, 198, 255), rgb(232, 233, 253));
     margin: 0;
-    flex-wrap: wrap;
     flex-direction: column;
 }
 header{ 
@@ -25,13 +24,12 @@ header{
     
 }
 .container{
+    
    display: flex;
     flex-direction: column; 
     gap: 30px;
     align-items: center;    
-    width: 90%;
-    max-width: 800px;
-    
+    width: 100%;
 }
 .container1{
    display: flex;
@@ -49,7 +47,7 @@ header{
 }
 h2{ 
     text-align: center;
-    padding: 5px;
+    margin-bottom: 5px;
 }
 #postform input,
 #postform label,
@@ -74,7 +72,7 @@ table{
     width: 100%;
 
 }
-table, th, tr{
+table, th, tr, tbody, td{
     border: 1px solid black;
 }
 .formsection{
@@ -85,7 +83,6 @@ table, th, tr{
     border-radius: 10px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
-/*button*/
 #submitbtn {
    font-size: 18px;
 letter-spacing: 2px;
@@ -93,26 +90,18 @@ text-transform: uppercase;
 display: inline-block;
 text-align: center;
 font-weight: bold;
-padding: 0.7em 2em;
+padding: 15px;
 border: 3px solid rgb(204, 211, 252);
 border-radius: 2px;
 position: relative;
 box-shadow: 0 2px 10px ☐ rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.1);
-color: rgb(79, 80, 90);
-text-decoration: none;
+color: rgb(79, 80, 90); 
 transition: 0.3s ease all;
-z-index: 1;
+
 }
 #submitbtn::before{
     transition: 0.5s all ease;
-    top: 0;
-    left: 50%;
-    right: 50%;
-    bottom: 0;
-    opacity: 0;
-    content: '';
     background-color: rgb(204, 211, 252);
-    z-index: 1;
 }
 #submitbtn:hover, #submitbtn:focus {
     color: white;
@@ -132,7 +121,7 @@ text-transform: uppercase;
 display: inline-block;
 text-align: center;
 font-weight: bold;
-padding: 0.7em 2em;
+padding: 9px;
 border: 3px solid rgb(180, 110, 110);
 border-radius: 2px;
 position: relative;
@@ -140,19 +129,13 @@ box-shadow: 0 2px 10px ☐ rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.1);
 color: rgb(79, 80, 90);
 text-decoration: none;
 transition: 0.3s ease all;
-z-index: 1;
+
 background-color: rgb(255, 171, 171);
 }
 #submitbtn::before{
-    transition: 0.5s all ease;
-    top: 0;
-    left: 50%;
-    right: 50%;
-    bottom: 0;
-    opacity: 0;
-    content: '';
+    transition: 0.5s ease all;
     background-color: rgb(170, 77, 77);
-    z-index: 1;
+    
 }
 #deletebtn:hover, #deletebtn:focus{
     color: white;
@@ -160,3 +143,5 @@ background-color: rgb(255, 171, 171);
 #deletebtn:active{
 transform: scale(0.9);
 }
+
+
