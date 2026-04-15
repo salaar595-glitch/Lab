@@ -1,133 +1,102 @@
-let posts = JSON.parse(localStorage.getItem('myPosts')) || [];;
+const API = 'http://localhost:3000/api/posts';
+
 const form = document.getElementById('postform');
 const tableBody = document.querySelector('#posttable tbody'); 
-const clearBtn = document.getElementById('deletebtn'); 
-const errorDiv = document.getElementById('formError');
 const postIdInput = document.getElementById('postId');
+const errorDiv = document.getElementById('formError');
 const submitBtn = document.getElementById('submitbtn');
 
-function readForm() { 
-    return { 
-        title: document.getElementById("title").value.trim(),
-        category: document.getElementById('category').value,
-        body: document.getElementById('Body').value.trim(),
-        author: document.getElementById('Author').value.trim()
-    };
+async function loadPosts() {
+    const res = await fetch(API);
+    const data = await res.json();
+    render(data.items);
 }
 
-function validate(data) { 
-    if (!data.title) return "Введіть заголовок";
-    if (!data.category) return "Оберіть категорію";
-    if (!data.body) return "Введіть текст"; 
-    if (!data.author) return "Введіть автора"; 
-    return null;
-}
-
-function createPost(data) { 
-    return { 
-        id: Date.now(), 
-        ...data, 
-        createdAt: new Date().toLocaleString() 
-    };
-}
-
-function render() {
+function render(posts) {
     tableBody.innerHTML = "";
+
     posts.forEach(post => {
         const tr = document.createElement("tr");
+
         tr.innerHTML = `
             <td>${post.title}</td>
             <td>${post.category}</td>
-            <td>${post.body}</td> 
+            <td>${post.body}</td>
             <td>${post.createdAt}</td>
-            <td>${post.author}</td> 
+            <td>${post.author}</td>
             <td>
-                <button data-id="${post.id}" class="edit-btn"> Ред.</button>
-                <button data-id="${post.id}" class="delete-btn"> Вид.</button>
-            </td>`;
+                <button data-id="${post.id}" class="edit-btn">Ред.</button>
+                <button data-id="${post.id}" class="delete-btn">Вид.</button>
+            </td>
+        `;
+
         tableBody.appendChild(tr);
     });
 }
 
-function addPost(data) {
-    const newPost = createPost(data);
-    posts.push(newPost);
-    saveToLocalStorage();
+function readForm() {
+    return {
+        title: title.value.trim(),
+        category: category.value,
+        body: Body.value.trim(),
+        author: Author.value.trim()
+    };
 }
 
-function updatePost(id, data) {
-    posts = posts.map(post => post.id === id ? { ...post, ...data } : post);
-    saveToLocalStorage();
-}
-
-function deletePost(id) {
-    if(confirm("Ви впевнені, що хочете видалити цей пост?")) {
-        posts = posts.filter(p => p.id !== id);
-        saveToLocalStorage();
-        render();
-    }
-}
-
-function editPost(id) {
-    const post = posts.find(p => p.id === id);
-    if (!post) return;
-
-    document.getElementById("title").value = post.title;
-    document.getElementById('category').value = post.category;
-    document.getElementById('Body').value = post.body;
-    document.getElementById('Author').value = post.author;
-    postIdInput.value = post.id;
-
-    submitBtn.textContent = "Оновити пост";
-    form.scrollIntoView({ behavior: 'smooth' });
-}
-
-function clearForm() {
-    form.reset();
-    postIdInput.value = "";
-    errorDiv.textContent = "";
-    submitBtn.textContent = "Надіслати пост";
-}
-
-form.addEventListener("submit", function(e) {
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
     errorDiv.textContent = "";
 
-    const formData = readForm();
-    const error = validate(formData);
+    const data = readForm();
+    const id = postIdInput.value;
 
-    if (error) {
-        errorDiv.textContent = error;
-        return;
+    try {
+        if (id) {
+            await fetch(`${API}/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+        } else {
+            await fetch(API, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+        }
+
+        form.reset();
+        postIdInput.value = "";
+        submitBtn.textContent = "Надіслати пост";
+
+        loadPosts();
+
+    } catch (e) {
+        errorDiv.textContent = "Помилка запиту";
     }
-
-    const currentId = postIdInput.value;
-
-    if (currentId) {
-        updatePost(Number(currentId), formData);
-    } else {
-        addPost(formData);
-    }
-
-    render();
-    clearForm();
 });
 
-tableBody.addEventListener("click", function(e) {
-    const id = Number(e.target.dataset.id);
+tableBody.addEventListener("click", async (e) => {
+    const id = e.target.dataset.id;
     if (!id) return;
 
     if (e.target.classList.contains("delete-btn")) {
-        deletePost(id);
+        await fetch(`${API}/${id}`, { method: 'DELETE' });
+        loadPosts();
     }
-    
+
     if (e.target.classList.contains("edit-btn")) {
-        editPost(id);
+        const res = await fetch(`${API}/${id}`);
+        const post = await res.json();
+
+        title.value = post.title;
+        category.value = post.category;
+        Body.value = post.body;
+        Author.value = post.author;
+
+        postIdInput.value = post.id;
+        submitBtn.textContent = "Оновити пост";
     }
 });
 
-clearBtn.addEventListener("click", clearForm);
-function saveToLocalStorage() {
-    localStorage.setItem('myPosts', JSON.stringify(posts));
-}
-render();
+loadPosts();
