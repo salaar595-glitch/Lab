@@ -1,26 +1,76 @@
-let posts = [];
+const db = require('../db/db');
 
-exports.getAll = () => posts;
 
-exports.getById = (id) => posts.find(p => p.id === id);
+exports.getAll = () => {
+
+    return db.prepare(`
+        SELECT * FROM posts
+        ORDER BY id DESC
+    `).all();
+};
+
+
+
+exports.getById = (id) => {
+
+    return db.prepare(`
+        SELECT * FROM posts
+        WHERE id = ${id}
+    `).get();
+};
+
+
 
 exports.create = (post) => {
-    posts.push(post);
-    return post;
+
+    const sql = `
+        INSERT INTO posts(
+            title,
+            category,
+            body,
+            author
+        )
+        VALUES(
+            '${post.title}',
+            '${post.category}',
+            '${post.body}',
+            '${post.author}'
+        )
+    `;
+
+    console.log(sql);
+
+    const result = db.prepare(sql).run();
+
+    return {
+        id: result.lastInsertRowid,
+        ...post
+    };
 };
 
-exports.update = (id, data) => {
-    const index = posts.findIndex(p => p.id === id);
-    if (index === -1) return null;
 
-    posts[index] = { ...posts[index], ...data };
-    return posts[index];
+
+exports.update = (id, post) => {
+
+    db.prepare(`
+        UPDATE posts
+        SET
+            title='${post.title}',
+            category='${post.category}',
+            body='${post.body}',
+            author='${post.author}'
+        WHERE id=${id}
+    `).run();
+
+    return exports.getById(id);
 };
+
+
 
 exports.delete = (id) => {
-    const index = posts.findIndex(p => p.id === id);
-    if (index === -1) return false;
 
-    posts.splice(index, 1);
-    return true;
+    return db.prepare(`
+        DELETE FROM posts
+        WHERE id=${id}
+    `).run();
 };

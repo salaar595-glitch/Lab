@@ -143,5 +143,27 @@ background-color: rgb(255, 171, 171);
 #deletebtn:active{
 transform: scale(0.9);
 }
+.comment-box{
+    margin-top: 10px;
+}
+
+.comment-box input{
+    width: 100%;
+    margin-top: 5px;
+    padding: 5px;
+}
+
+.comment-btn{
+    margin-top: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.comment{
+    background-color: rgb(240,240,240);
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 5px;
+}
 
 

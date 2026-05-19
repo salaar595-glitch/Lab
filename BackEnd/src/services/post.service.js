@@ -1,40 +1,59 @@
 const repo = require('../repositories/post.repository');
 
 exports.getPosts = () => {
-    return { items: repo.getAll() };
+
+    return {
+        items: repo.getAll()
+    };
 };
+
+
 
 exports.getPost = (id) => {
-    const post = repo.getById(id);
-    if (!post) throw { status: 404, message: "Post not found" };
-    return post;
-};
 
-exports.createPost = (data) => {
-    if (!data.title || !data.body) {
+    const post = repo.getById(id);
+
+    if (!post) {
+
         throw {
-            status: 400,
-            code: "VALIDATION_ERROR",
-            message: "Title and body required"
+            status: 404,
+            message: 'Post not found'
         };
     }
 
-    const post = {
-        id: Date.now(),
-        ...data,
-        createdAt: new Date().toISOString()
-    };
-
-    return repo.create(post);
+    return post;
 };
+
+
+
+exports.createPost = (data) => {
+
+    if (
+        !data.title ||
+        !data.category ||
+        !data.body ||
+        !data.author
+    ) {
+
+        throw {
+            status: 400,
+            message: 'All fields required'
+        };
+    }
+
+    return repo.create(data);
+};
+
+
 
 exports.updatePost = (id, data) => {
-    const updated = repo.update(id, data);
-    if (!updated) throw { status: 404, message: "Post not found" };
-    return updated;
+
+    return repo.update(id, data);
 };
 
+
+
 exports.deletePost = (id) => {
-    const ok = repo.delete(id);
-    if (!ok) throw { status: 404, message: "Post not found" };
+
+    return repo.delete(id);
 };
