@@ -27,23 +27,25 @@ exports.getPost = (id) => {
 
 
 exports.createPost = (data) => {
+    const author = data.authorId || data.author;
 
     if (
         !data.title ||
         !data.category ||
         !data.body ||
-        !data.author
+        !author
     ) {
-
         throw {
             status: 400,
             message: 'All fields required'
         };
     }
 
-    return repo.create(data);
+    return repo.create({
+        ...data,
+        authorId: author
+    });
 };
-
 
 
 exports.updatePost = (id, data) => {
