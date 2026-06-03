@@ -1,46 +1,40 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
 
-const db = require('./db/db');
+const postRoutes= require('./routes/post.routes');
+const userRoutes= require('./routes/user.routes');
+const commentRoutes= require('./routes/comment.routes');
 
-const postRoutes = require('./routes/post.routes');
-const userRoutes = require('./routes/user.routes');
-const commentRoutes = require('./routes/comment.routes');
-
-const logger = require('./middleware/logger.middleware');
-const errorMiddleware = require('./middleware/error.middleware');
+const logger= require('./middleware/logger.middleware');
+const errorMiddleware= require('./middleware/error.middleware');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5500',
+        'http://127.0.0.1:5500',
+        'http://localhost:5173',
+        'http://127.0.0.1:5173'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 app.use(logger);
 
-const schema = fs.readFileSync(
-    path.join(__dirname, './db/schema.sql'),
-    'utf8'
-);
 
-db.exec(schema, (err) => {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('Schema initialized');
-    }
-});
-
-app.use('/api/posts', postRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/comments', commentRoutes);
+app.use('/api/v1/posts',    postRoutes);
+app.use('/api/v1/users',    userRoutes);
+app.use('/api/v1/comments', commentRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
-        error: {
-            code: 'NOT_FOUND',
-            message: 'Route not found'
-        }
+        status:  404,
+        title:   'Not Found',
+        detail:  'Route not found',
+        errors:  []
     });
 });
 
