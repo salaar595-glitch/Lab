@@ -1,81 +1,74 @@
 const userService = require('../services/user.service');
 
-exports.createUser = (req, res) => {
+exports.createUser = (req, res, next) => {
+    try {
+        const { name, email } = req.body;
 
-  const { name, email } = req.body;
+        if (!name || !email) {
+            return next({ status: 400, message: 'name and email are required' });
+        }
 
-  if (!name || !email) {
-    return res.status(400).json({
-      message: 'name and email are required'
-    });
-  }
+        const user = userService.createUser({ name, email });
+        res.status(201).json(user);
 
-  const user = userService.createUser({
-    name,
-    email
-  });
-
-  res.status(201).json(user);
-};
-
-exports.getUsers = (req, res) => {
-
-  const users = userService.getUsers();
-
-  res.json(users);
-};
-
-exports.getUserById = (req, res) => {
-
-  const user = userService.getUserById(req.params.id);
-
-  if (!user) {
-    return res.status(404).json({
-      message: 'User not found'
-    });
-  }
-
-  res.json(user);
-};
-
-exports.updateUser = (req, res) => {
-
-  const { name, email } = req.body;
-
-  if (!name || !email) {
-    return res.status(400).json({
-      message: 'name and email are required'
-    });
-  }
-
-  const updatedUser = userService.updateUser(
-    req.params.id,
-    {
-      name,
-      email
+    } catch (err) {
+        next(err);
     }
-  );
-
-  if (!updatedUser) {
-    return res.status(404).json({
-      message: 'User not found'
-    });
-  }
-
-  res.json(updatedUser);
 };
 
-exports.deleteUser = (req, res) => {
+exports.getUsers = (req, res, next) => {
+    try {
+        const users = userService.getUsers();
+        res.json(users);
+    } catch (err) {
+        next(err);
+    }
+};
 
-  const result = userService.deleteUser(req.params.id);
+exports.getUserById = (req, res, next) => {
+    try {
+        const user = userService.getUserById(req.params.id);
 
-  if (result.changes === 0) {
-    return res.status(404).json({
-      message: 'User not found'
-    });
-  }
+        if (!user) {
+            return next({ status: 404, message: 'User not found' });
+        }
 
-  res.json({
-    message: 'Deleted'
-  });
+        res.json(user);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.updateUser = (req, res, next) => {
+    try {
+        const { name, email } = req.body;
+
+        if (!name || !email) {
+            return next({ status: 400, message: 'name and email are required' });
+        }
+
+        const updatedUser = userService.updateUser(req.params.id, { name, email });
+
+        if (!updatedUser) {
+            return next({ status: 404, message: 'User not found' });
+        }
+
+        res.json(updatedUser);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.deleteUser = (req, res, next) => {
+    try {
+        const result = userService.deleteUser(req.params.id);
+
+        if (result.changes === 0) {
+            return next({ status: 404, message: 'User not found' });
+        }
+
+        res.json({ message: 'Deleted' });
+    } catch (err) {
+        next(err);
+    }
 };

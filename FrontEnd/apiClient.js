@@ -19,6 +19,7 @@ async function request(method, path, body) {
         const message = data.detail || data.title || `HTTP ${res.status}`;
         const err = new Error(message);
         err.status = res.status;
+        err.code   = data.code || res.status;
         err.errors = data.errors || [];
         throw err;
     }

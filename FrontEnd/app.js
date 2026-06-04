@@ -1,4 +1,3 @@
-
 const form = document.getElementById('postform');
 const tableBody = document.querySelector('#posttable tbody');
 const postIdInput = document.getElementById('postId');
@@ -6,8 +5,9 @@ const errorDiv = document.getElementById('formError');
 const submitBtn = document.getElementById('submitbtn');
 const statusDiv = document.getElementById('status');
 
-function showStatus(text) {
+function showStatus(text, type = '') {
     statusDiv.textContent = text;
+    statusDiv.className = type ? `status-${type}` : '';
 }
 
 function setFormError(msg) {
@@ -59,22 +59,22 @@ function readForm() {
 }
 
 async function loadPosts() {
-    showStatus('Завантаження...');
+    showStatus('Завантаження...', 'loading');
     try {
         const data = await apiClient.getList();
 
         if (!data.items || data.items.length === 0) {
             render([]);
-            showStatus('Немає даних');
+            showStatus('Немає даних', 'empty');
             return;
         }
 
         render(data.items);
-        showStatus('');
+        showStatus('✓ Дані завантажено', 'success'); // <-- ОСЬ ВИПРАВЛЕННЯ
 
     } catch (err) {
         render([]);
-        showStatus(`Помилка завантаження: ${err.message}`);
+        showStatus(`Помилка завантаження: ${err.message}`, 'error');
         console.error(err);
     }
 }

@@ -2,10 +2,11 @@ module.exports = (err, req, res, next) => {
     const status = err.status || 500;
 
     res.status(status).json({
-        status:  status,
-        title:   err.title   || httpTitle(status),
-        detail:  err.message || 'Внутрішня помилка сервера',
-        errors:  err.errors  || []
+        code:   status,
+        status: status,
+        title:  err.title   || httpTitle(status),
+        detail: err.message || 'Внутрішня помилка сервера',
+        errors: err.errors  || []
     });
 };
 

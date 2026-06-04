@@ -165,5 +165,9 @@ transform: scale(0.9);
     padding: 5px;
     border-radius: 5px;
 }
+#status.status-loading { color: #888; font-style: italic; }
+#status.status-success { color: #2a7a2a; font-weight: bold; }
+#status.status-empty   { color: #999; }
+#status.status-error   { color: #cc0000; font-weight: bold; }
 
 
