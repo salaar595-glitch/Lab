@@ -10,9 +10,9 @@ exports.getById = (id) => {
 
 exports.create = (post) => {
     const result = db.prepare(`
-        INSERT INTO posts (title, category, body, author)
-        VALUES (?, ?, ?, ?)
-    `).run(post.title, post.category, post.body, post.author);
+        INSERT INTO posts (title, category, body, author, ownerUserId)
+        VALUES (?, ?, ?, ?, ?)
+    `).run(post.title, post.category, post.body, post.author, post.ownerUserId);
 
     return { id: result.lastInsertRowid, ...post };
 };
@@ -29,4 +29,10 @@ exports.update = (id, post) => {
 
 exports.delete = (id) => {
     return db.prepare(`DELETE FROM posts WHERE id = ?`).run(id);
+};
+
+
+exports.searchSafe = (title) => {
+
+    return db.prepare(`SELECT * FROM posts WHERE title = ?`).all(title);
 };

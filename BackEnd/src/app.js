@@ -1,14 +1,23 @@
 const express = require('express');
-const cors = require('cors');
+const cors    = require('cors');
 
-const postRoutes= require('./routes/post.routes');
-const userRoutes= require('./routes/user.routes');
-const commentRoutes= require('./routes/comment.routes');
+const postRoutes    = require('./routes/post.routes');
+const userRoutes    = require('./routes/user.routes');
+const commentRoutes = require('./routes/comment.routes');
 
-const logger= require('./middleware/logger.middleware');
-const errorMiddleware= require('./middleware/error.middleware');
+const logger          = require('./middleware/logger.middleware');
+const errorMiddleware = require('./middleware/error.middleware');
+const authMiddleware  = require('./middleware/auth.middleware');
 
 const app = express();
+
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.removeHeader('X-Powered-By');
+    next();
+});
 
 app.use(cors({
     origin: [
@@ -18,24 +27,18 @@ app.use(cors({
         'http://127.0.0.1:5173'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ['Content-Type', 'X-Demo-UserId']
 }));
 
 app.use(express.json());
 app.use(logger);
 
-
-app.use('/api/v1/posts',    postRoutes);
+app.use('/api/v1/posts',    authMiddleware, postRoutes);
+app.use('/api/v1/comments', authMiddleware, commentRoutes);
 app.use('/api/v1/users',    userRoutes);
-app.use('/api/v1/comments', commentRoutes);
 
 app.use((req, res) => {
-    res.status(404).json({
-        status:  404,
-        title:   'Not Found',
-        detail:  'Route not found',
-        errors:  []
-    });
+    res.status(404).json({ code: 404, message: 'Route not found' });
 });
 
 app.use(errorMiddleware);

@@ -1,25 +1,32 @@
 const API_BASE_URL = 'http://localhost:3000/api/v1';
 
+let currentUserId = 1;
+
+export function setCurrentUser(id) {
+    currentUserId = id;
+}
+
 async function request(method, path, body) {
     const options = {
         method,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+            'Content-Type':  'application/json',
+            'X-Demo-UserId': String(currentUserId)
+        }
     };
     if (body !== undefined) {
         options.body = JSON.stringify(body);
     }
 
     const res = await fetch(`${API_BASE_URL}${path}`, options);
-
     if (res.status === 204) return null;
 
     const data = await res.json();
 
     if (!res.ok) {
-        const message = data.detail || data.title || `HTTP ${res.status}`;
-        const err = new Error(message);
+        const err = new Error(data.message || `HTTP ${res.status}`);
         err.status = res.status;
-        err.code   = data.code || res.status;
+        err.code   = data.code   || res.status;
         err.errors = data.errors || [];
         throw err;
     }
