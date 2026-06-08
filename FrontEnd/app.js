@@ -1,18 +1,26 @@
-const form = document.getElementById('postform');
-const tableBody = document.querySelector('#posttable tbody');
+import { setToken, clearToken } from './apiClient.js';
+
+const authSection   = document.getElementById('authSection');
+const appSection    = document.getElementById('appSection');
+const loginForm     = document.getElementById('loginForm');
+const registerForm  = document.getElementById('registerForm');
+const logoutBtn     = document.getElementById('logoutBtn');
+const userInfo      = document.getElementById('userInfo');
+const showRegister  = document.getElementById('showRegister');
+const showLogin     = document.getElementById('showLogin');
+const authError     = document.getElementById('authError');
+
+const form       = document.getElementById('postform');
+const tableBody  = document.querySelector('#posttable tbody');
 const postIdInput = document.getElementById('postId');
-const errorDiv = document.getElementById('formError');
-const submitBtn = document.getElementById('submitbtn');
-const statusDiv = document.getElementById('status');
+const errorDiv   = document.getElementById('formError');
+const submitBtn  = document.getElementById('submitbtn');
+const statusDiv  = document.getElementById('status');
 
 function escapeHtml(str) {
     const el = document.createElement('div');
     el.textContent = String(str ?? '');
     return el.innerHTML;
-}
-
-function setText(el, value) {
-    el.textContent = String(value ?? '');
 }
 
 function showStatus(text, type = '') {
@@ -28,6 +36,91 @@ function lockBtn(locked) {
     submitBtn.disabled = locked;
     submitBtn.style.opacity = locked ? '0.6' : '1';
 }
+
+function setAuthError(msg) {
+    authError.textContent = msg;
+}
+
+function showApp(user) {
+    authSection.style.display = 'none';
+    appSection.style.display  = 'block';
+    userInfo.textContent = `Увійшов: ${user.name} (${user.role})`;
+    loadPosts();
+}
+
+function showAuth() {
+    authSection.style.display = 'block';
+    appSection.style.display  = 'none';
+    tableBody.innerHTML = '';
+}
+
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+        const data = await apiClient.login({ email, password });
+        setToken(data.token);
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('authUser', JSON.stringify(data.user));
+        showApp(data.user);
+    } catch (err) {
+        setAuthError(`Помилка: ${err.message}`);
+    }
+});
+
+registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    const name     = document.getElementById('regName').value.trim();
+    const email    = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+
+    try {
+        await apiClient.register({ name, email, password });
+        // Після реєстрації — одразу логін
+        const data = await apiClient.login({ email, password });
+        setToken(data.token);
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('authUser', JSON.stringify(data.user));
+        showApp(data.user);
+    } catch (err) {
+        setAuthError(`Помилка: ${err.message}`);
+    }
+});
+
+logoutBtn.addEventListener('click', async () => {
+    try { await apiClient.logout(); } catch (_) {}
+    clearToken();
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
+    showAuth();
+});
+
+showRegister.addEventListener('click', () => {
+    loginForm.style.display    = 'none';
+    registerForm.style.display = 'block';
+    setAuthError('');
+});
+
+showLogin.addEventListener('click', () => {
+    registerForm.style.display = 'none';
+    loginForm.style.display    = 'block';
+    setAuthError('');
+});
+
+(function restoreSession() {
+    const token = localStorage.getItem('authToken');
+    const user  = localStorage.getItem('authUser');
+    if (token && user) {
+        setToken(token);
+        showApp(JSON.parse(user));
+    } else {
+        showAuth();
+    }
+})();
 
 function validateForm(data) {
     const errors = [];
@@ -69,9 +162,15 @@ async function loadPosts() {
         render(data.items);
         showStatus('✓ Дані завантажено', 'success');
     } catch (err) {
+        if (err.status === 401) {
+            clearToken();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
+            showAuth();
+            return;
+        }
         render([]);
         showStatus(`Помилка завантаження: ${err.message}`, 'error');
-        console.error(err);
     }
 }
 
@@ -89,24 +188,20 @@ async function loadComments(postId) {
         }
 
         data.items.forEach(comment => {
-            const div = document.createElement('div');
+            const div  = document.createElement('div');
             div.className = 'comment';
-
             const bold = document.createElement('b');
             bold.textContent = comment.author;
-
             div.appendChild(bold);
             div.appendChild(document.createTextNode(': ' + comment.text));
             container.appendChild(div);
         });
-
     } catch (err) {
         const errDiv = document.createElement('div');
         errDiv.className = 'error';
         errDiv.textContent = `Помилка коментарів: ${err.message}`;
         container.innerHTML = '';
         container.appendChild(errDiv);
-        console.error(err);
     }
 }
 
@@ -135,12 +230,12 @@ function render(posts) {
         deleteBtn.dataset.id = post.id;
         deleteBtn.textContent = 'Вид.';
 
-        const commentBox = document.createElement('div');
+        const commentBox   = document.createElement('div');
         commentBox.className = 'comment-box';
 
         const commentInput = document.createElement('input');
         commentInput.type = 'text';
-        commentInput.id = `comment-${post.id}`;
+        commentInput.id   = `comment-${post.id}`;
         commentInput.placeholder = 'Коментар';
 
         const commentBtn = document.createElement('button');
@@ -187,10 +282,14 @@ form.addEventListener('submit', async (e) => {
         submitBtn.textContent = 'Надіслати пост';
         await loadPosts();
     } catch (err) {
-        const detail = err.errors && err.errors.length > 0
-            ? err.errors.join(' | ')
-            : err.message;
-        setFormError(`Помилка (${err.status}): ${detail}`);
+        if (err.status === 403) {
+            setFormError('Помилка (403): ви не є власником цього поста');
+        } else {
+            const detail = err.errors && err.errors.length > 0
+                ? err.errors.join(' | ')
+                : err.message;
+            setFormError(`Помилка (${err.status}): ${detail}`);
+        }
     } finally {
         lockBtn(false);
     }
@@ -207,7 +306,11 @@ tableBody.addEventListener('click', async (e) => {
             await apiClient.remove(id);
             await loadPosts();
         } catch (err) {
-            alert(`Помилка видалення (${err.status}): ${err.message}`);
+            if (err.status === 403) {
+                alert('Помилка (403): ви не є власником цього поста');
+            } else {
+                alert(`Помилка видалення (${err.status}): ${err.message}`);
+            }
             e.target.disabled = false;
         }
     }
@@ -219,7 +322,7 @@ tableBody.addEventListener('click', async (e) => {
             document.getElementById('category').value = post.category;
             document.getElementById('Body').value     = post.body;
             document.getElementById('Author').value   = post.author;
-            postIdInput.value = post.id;
+            postIdInput.value     = post.id;
             submitBtn.textContent = 'Оновити пост';
         } catch (err) {
             alert(`Помилка завантаження запису (${err.status}): ${err.message}`);
@@ -250,5 +353,3 @@ document.getElementById('deletebtn').addEventListener('click', () => {
     submitBtn.textContent = 'Надіслати пост';
     setFormError('');
 });
-
-loadPosts();

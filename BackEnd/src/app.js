@@ -4,6 +4,7 @@ const cors    = require('cors');
 const postRoutes    = require('./routes/post.routes');
 const userRoutes    = require('./routes/user.routes');
 const commentRoutes = require('./routes/comment.routes');
+const authRoutes    = require('./routes/auth.routes');
 
 const logger          = require('./middleware/logger.middleware');
 const errorMiddleware = require('./middleware/error.middleware');
@@ -27,11 +28,14 @@ app.use(cors({
         'http://127.0.0.1:5173'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'X-Demo-UserId']
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
 app.use(logger);
+
+
+app.use('/api/v1/auth', authRoutes);
 
 app.use('/api/v1/posts',    authMiddleware, postRoutes);
 app.use('/api/v1/comments', authMiddleware, commentRoutes);

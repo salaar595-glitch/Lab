@@ -1,68 +1,98 @@
-<!Doctype html>
-<html lang = "uk">
+<!DOCTYPE html>
+<html lang="uk">
 <head>
-    <meta charset = "utf-8" />
-    <meta name = "viewport" content = "width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="styles.css" type="text/css">
-     <script src="apiClient.js" defer></script>
-    <script src="app.js" defer>  </script>
-    <title> Оголошення  </title>
+    <title>Оголошення</title>
 </head>
 <body>
-  <div class="container">
+<div class="container">
     <header>
-      
-    <h1>Доска оголошень групи </h1>
-
+        <h1>Дошка оголошень групи</h1>
     </header>
-    
-<main> 
-  <div class="container1">
-  <section class="listsection">
-    <h2>Таблиця оголошень</h2>
-    <div id="status"></div>
-  <table id="posttable">
-    <input type="hidden" id="postId">
-    <thead>
-        <tr>
-        <th>Заголовок</th>
-         <th>Котегорія</th>
-          <th>Зміст</th>
-           <th>Дата</th>
-            <th>Автор</th>
-            </tr>
-    </thead><tbody> </tbody>
-     </table>
-  </section>
-  <br>
-  <section class="formsection">
-    <h2>Створити пост</h2>
-    <form id="postform"> 
-        <label for="title">Заголовок</label>
-        <input type="text" id="title" required> </input>
-        <label for="category">Категорія</label>
-        <select id="category" required>
-            <option value="">Оберіть</option>
-            <option value="Навчання">Навчання</option> 
-            <option value="Робота">Робота</option> 
-            <option value="Продаж">Продаж</option> 
-            <option value="Інше">Інше</option> 
-        </select>
-        <label for="Body">Зміст</label>
-        <textarea id="Body" required></textarea>
-        <label for="Author">Автор</label>
-        <input type="text" id="Author" required>
-          <div id="formError" class="error"></div>
-        <button type="submit" id="submitbtn" required>Надіслати пост</button>
-        <button type="button" id="deletebtn" ruquired>Очистити</button>
 
-  </form>
-  </section>
-  </div>
+    <div id="authSection">
+        <div id="authError" class="error"></div>
+
+        <div id="loginForm" class="auth-form">
+            <h2>Вхід</h2>
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required>
+            <label for="loginPassword">Пароль</label>
+            <input type="password" id="loginPassword" required>
+            <button type="submit" onclick="document.getElementById('loginForm').dispatchEvent(new Event('submit', {bubbles:true, cancelable:true}))">Увійти</button>
+            <p>Немає акаунту? <a href="#" id="showRegister">Зареєструватись</a></p>
+        </div>
+
+        <div id="registerForm" class="auth-form" style="display:none">
+            <h2>Реєстрація</h2>
+            <label for="regName">Ім'я</label>
+            <input type="text" id="regName" required>
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" required>
+            <label for="regPassword">Пароль (мін. 6 символів)</label>
+            <input type="password" id="regPassword" required>
+            <button type="submit" onclick="document.getElementById('registerForm').dispatchEvent(new Event('submit', {bubbles:true, cancelable:true}))">Зареєструватись</button>
+            <p>Вже є акаунт? <a href="#" id="showLogin">Увійти</a></p>
+        </div>
+    </div>
+
+    <div id="appSection" style="display:none">
+        <div class="app-header">
+            <span id="userInfo"></span>
+            <button id="logoutBtn">Вийти</button>
+        </div>
+
+        <main>
+            <div class="container1">
+                <section class="listsection">
+                    <h2>Таблиця оголошень</h2>
+                    <div id="status"></div>
+                    <table id="posttable">
+                        <input type="hidden" id="postId">
+                        <thead>
+                            <tr>
+                                <th>Заголовок</th>
+                                <th>Категорія</th>
+                                <th>Зміст</th>
+                                <th>Дата</th>
+                                <th>Автор</th>
+                                <th>Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </section>
+
+                <section class="formsection">
+                    <h2>Створити пост</h2>
+                    <form id="postform">
+                        <label for="title">Заголовок</label>
+                        <input type="text" id="title">
+                        <label for="category">Категорія</label>
+                        <select id="category">
+                            <option value="">Оберіть</option>
+                            <option value="Навчання">Навчання</option>
+                            <option value="Робота">Робота</option>
+                            <option value="Продаж">Продаж</option>
+                            <option value="Інше">Інше</option>
+                        </select>
+                        <label for="Body">Зміст</label>
+                        <textarea id="Body"></textarea>
+                        <label for="Author">Автор</label>
+                        <input type="text" id="Author">
+                        <div id="formError" class="error"></div>
+                        <button type="submit" id="submitbtn">Надіслати пост</button>
+                        <button type="button" id="deletebtn">Очистити</button>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
 </div>
-</main>
-<footer>
-</footer>
-</body> 
 
+<script type="module" src="apiClient.js"></script>
+<script type="module" src="app.js"></script>
+</body>
 </html>
